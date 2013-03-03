@@ -1,0 +1,7 @@
+fabric
+greenlet
+pycrypto
+paramiko
+gevent
+pysolr
+simplejson
