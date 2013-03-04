@@ -1,4 +1,7 @@
-What?
+====
+What
+====
+
 Purpose of this is to determine at what point DSE (cassandra <=> solr) starts
 experiencing performance degradation as the number of nodes in the cluster
 increases. 
