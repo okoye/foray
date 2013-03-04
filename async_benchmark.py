@@ -44,11 +44,11 @@ class Benchmark(object):
       greenlets = []
       for i in xrange(self.requests):
          greenlets.append(gevent.spawn(self._request))
-         print 'spawning greenlet %i'%i
 
       print 'now waiting for greenlet completion...'
       gevent.joinall(greenlets)
-      
+      print 'all greenlets completed'
+
    def _request(self):
       '''
       each of this is run in a greenlet thread.
@@ -60,7 +60,7 @@ class Benchmark(object):
       start = diff(0)
       #TODO result = solr.search(<SEARCH TERMS>)
       delta_time = diff(start)
-      self.q.put('%f'%delta_time, block=False)
+      #self.q.put('%f'%delta_time, block=False)
       
 ###############Process Management################
 if __name__ == '__main__':
@@ -83,7 +83,7 @@ if __name__ == '__main__':
                nodes=opts.nodes)
       processes.append(Process(target=benchmark.start))
       processes[-1].start()
-  
+   
    #Signal handlers
    def shutdown(signum, stackframe):
       for proc in processes:
@@ -101,7 +101,8 @@ if __name__ == '__main__':
       print 'writing output to file' 
       with open(output_file, "w") as f:
          while not queue.empty():
-            f.write(queue.get(block=True, timeout=10))
+            f.write(queue.get(block=False))
    except KeyboardInterrupt as ki:
+      print 'executing shutdown procedure..'
       for proc in processes:
          proc.terminate()
