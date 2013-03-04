@@ -1,6 +1,3 @@
-Add support for pipe
-Use proper logging
-Write pipe data to disk when completed
 Convert .7z data to bz2 data for indexing
 Setup EC2 DSE cluster [increments of 5]
 Fabric should support uploading necessary files to amazon s3 bucket
