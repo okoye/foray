@@ -7,15 +7,14 @@ author: Chuka <okoye9@gmail.com>
 import optparse
 import signal
 import pysolr
-import gevent
 import random
-from datetime import datetime
-from gevent import monkey; monkey.patch_socket()
+import time
+from multiprocessing import Process
 
 ###############Benchmark Proper#################
 class Benchmark(object):
    
-   def __init__(self, i, num_req=1000, nodes='nodes.txt'):
+   def __init__(self, i, pipe, num_req=1000, nodes='nodes.txt'):
       self.process_id = i
       self.requests = int(num_req)
       self.solr_urls = []
@@ -31,7 +30,7 @@ class Benchmark(object):
    def _solr_url(self, node, port=8983, args=''):
       '''construct solr url object'''
       return 'http://%s:%s/%s'%(node, port, args)
-
+   
    def _benchmark(self):
       '''
       spawn request_no of solr requests
@@ -40,25 +39,24 @@ class Benchmark(object):
       from gevent import monkey; monkey.patch_socket()
 
       greenlets = []
-      #for i in xrange(self.requests):
-      #   greenlets.append(gevent.spawn(self._request))
-      #   print 'spawning greenlet %i'%i
-      g1 = gevent.spawn(self._request)
-      g2 = gevent.spawn(self._request)
+      for i in xrange(self.requests):
+         greenlets.append(gevent.spawn(self._request))
+         print 'spawning greenlet %i'%i
 
       print 'now waiting for greenlet completion...'
-      #gevent.joinall(greenlets)
-      gevent.joinall([g1, g2])
+      gevent.joinall(greenlets)
 
    def _request(self):
       '''
       each of this is run in a greenlet thread.
       actual request maker. records start time, end time and appends
       '''
-      pass
       #random.sample(self.solr_urls, 1)[0]
-      #for i in xrange(2):
-      #   print 'pinging solr %d'%i
+      lambda now: time.time()
+      start = now()
+      #TODO make solr call
+      delta_time = now() - start
+
 
 ###############Process Management################
 if __name__ == '__main__':
@@ -66,12 +64,27 @@ if __name__ == '__main__':
    parser.add_option('-r', '--requests', help='no of concurrent requests',
                      dest='requests', default=1000)
    parser.add_option('-p', '--processes', help='no of processes',
-                     dest='processes', default=1)
+                     dest='processes', default=4)
    parser.add_option('-n', '--nodes', help='nodes list file', 
                      dest='nodes', default='nodes.txt')
    (opts, args) = parser.parse_args()
 
-   benchmark = Benchmark(num_req=opts.requests, nodes=opts.nodes)
-   benchmark.start()
+   #Process management stuff
+   processes = []
+   for i in xrange(opts.processes):
+      benchmark = Benchmark(i, num_req=opts.requests, nodes=opts.nodes)
+      processes.append(Process(target=benchmark.start))
+      processes[-1].start()
+  
+   #Signal handlers
+   def shutdown(signum, stackframe):
+      for proc in processes:
+         proc.terminate()
+   signal.signal(signal.SIGTERM, shutdown)
 
-   #add process management stuff again
+   try:
+      for proc in processes:
+         proc.join()
+   except KeyboardInterrupt as ki:
+      for proc in processes:
+         proc.terminate()

@@ -28,3 +28,6 @@ Notes:
 You might need to install to libevent on your platform to run this script
 Also, the script requires a file called nodes.txt that contains a list of nodes
 to operate on.
+
+EC2 Notes:
+Installation of ec2 command line tools is recommended to list all ips for your DSE cluster.
