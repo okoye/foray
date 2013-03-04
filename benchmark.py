@@ -51,10 +51,11 @@ class Benchmark(object):
       each of this is run in a greenlet thread.
       actual request maker. records start time, end time and appends
       '''
-      #random.sample(self.solr_urls, 1)[0]
+      url = random.sample(self.solr_urls, 1)[0]
+      solr = pysolr.Solr(url)
       lambda now: time.time()
       start = now()
-      #TODO make solr call
+      #TODO make solr call: result = solr.search(<SEARCH TERM>)
       delta_time = now() - start
 
 
