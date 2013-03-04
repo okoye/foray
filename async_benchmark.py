@@ -59,10 +59,10 @@ class Benchmark(object):
       '''
       url = random.sample(self.solr_urls, 1)[0]
       solr = pysolr.Solr(url)
-      now = lambda x: time.time()
-      start = now()
+      diff = lambda past: time.time() - past
+      start = diff(0)
       #TODO result = solr.search(<SEARCH TERMS>)
-      delta_time = now() - start
+      delta_time = diff(start)
       self.pipe.put(delta_time, block=False)
 
 
@@ -80,8 +80,8 @@ if __name__ == '__main__':
    #Process management stuff
    processes = []
    pipe = Queue(int(opts.requests) * int(opts.processes))
-   for i in xrange(opts.processes):
-      benchmark = Benchmark(i, pipe, num_req=opts.requests, nodes=opts.nodes)
+   for i in xrange(int(opts.processes)):
+      benchmark = Benchmark(i, pipe, num_req=int(opts.requests), nodes=opts.nodes)
       processes.append(Process(target=benchmark.start))
       processes[-1].start()
   
