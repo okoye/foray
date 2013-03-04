@@ -22,7 +22,7 @@ class Benchmark(object):
       self.solr_urls = []
       self.q = queue
       for node in open(nodes):
-         self.solr_urls.append(self._solr_url(node))
+         self.solr_urls.append(self._solr_url(node.strip()))
       print 'solr node list: ', self.solr_urls 
       print 'Benchmark instantiated'
 
@@ -60,7 +60,7 @@ class Benchmark(object):
       start = diff(0)
       #TODO result = solr.search(<SEARCH TERMS>)
       delta_time = diff(start)
-      #self.q.put('%f'%delta_time, block=False)
+      self.q.put(delta_time, block=False)
       
 ###############Process Management################
 if __name__ == '__main__':
@@ -101,7 +101,7 @@ if __name__ == '__main__':
       print 'writing output to file' 
       with open(output_file, "w") as f:
          while not queue.empty():
-            f.write(queue.get(block=False))
+            f.write('%s\n'%queue.get(block=False))
    except KeyboardInterrupt as ki:
       print 'executing shutdown procedure..'
       for proc in processes:
