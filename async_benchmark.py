@@ -9,15 +9,19 @@ import signal
 import pysolr
 import random
 import time
-from multiprocessing import Process
+import logging
+import string
+from multiprocessing import Process, Queue
 
 ###############Benchmark Proper#################
 class Benchmark(object):
    
    def __init__(self, i, pipe, num_req=1000, nodes='nodes.txt'):
+      self._id = ''.join(random.sample(string.letters+string.digits, 10))
       self.process_id = i
       self.requests = int(num_req)
       self.solr_urls = []
+      self.pipe = pipe
       for node in open(nodes):
          self.solr_urls.append(self._solr_url(node))
       print 'solr node list: ', self.solr_urls 
@@ -45,6 +49,8 @@ class Benchmark(object):
 
       print 'now waiting for greenlet completion...'
       gevent.joinall(greenlets)
+      print 'greenlets finished computation'
+      
 
    def _request(self):
       '''
@@ -53,10 +59,11 @@ class Benchmark(object):
       '''
       url = random.sample(self.solr_urls, 1)[0]
       solr = pysolr.Solr(url)
-      lambda now: time.time()
+      now = lambda x: time.time()
       start = now()
-      #TODO make solr call: result = solr.search(<SEARCH TERM>)
+      #TODO result = solr.search(<SEARCH TERMS>)
       delta_time = now() - start
+      self.pipe.put(delta_time, block=False)
 
 
 ###############Process Management################
@@ -72,8 +79,9 @@ if __name__ == '__main__':
 
    #Process management stuff
    processes = []
+   pipe = Queue(int(opts.requests) * int(opts.processes))
    for i in xrange(opts.processes):
-      benchmark = Benchmark(i, num_req=opts.requests, nodes=opts.nodes)
+      benchmark = Benchmark(i, pipe, num_req=opts.requests, nodes=opts.nodes)
       processes.append(Process(target=benchmark.start))
       processes[-1].start()
   
