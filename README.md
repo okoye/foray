@@ -30,14 +30,14 @@ is regarded as the roundtrip processing time for solr.
 Description of scripts:
 =======================
 benchmark.py : runs actual benchmarking process. call with -h for more info
-fabfile.py : setups and configures each cassandra node in the cluster
+fabfile.py : setups and configures cassandra in the cluster
 
 ======
 Notes:
 ======
 You might need to install to libevent on your platform to run this script
 Also, the script requires a file called nodes.txt that contains a list of nodes
-to operate on.
+to operate on and expects a bz2 file in /tmp containing wikipedia dataset
 
 ==========
 EC2 Notes:

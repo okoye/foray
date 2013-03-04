@@ -13,7 +13,7 @@ def prepare_solr():
    Add schema
    Call index script with correct parameters
    '''
-   put('*.bz', '/tmp/')
+   put('/tmp/*.bz', '/tmp/')
    with cd('/usr/share/dse-demos/wikipedia'):
       run('./1-add-schema.sh')
       run('./2-index.sh --wikifile `ls /tmp/*.bz2`')
