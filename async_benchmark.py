@@ -17,7 +17,6 @@ from multiprocessing import Process, Queue
 class Benchmark(object):
    
    def __init__(self, i, queue, num_req=1000, nodes='nodes.txt'):
-      self._id = ''.join(random.sample(string.letters+string.digits, 10))
       self.process_id = i
       self.requests = int(num_req)
       self.solr_urls = []
@@ -49,9 +48,7 @@ class Benchmark(object):
 
       print 'now waiting for greenlet completion...'
       gevent.joinall(greenlets)
-      print 'greenlets finished computation', self.q.full()
-            
-
+      
    def _request(self):
       '''
       each of this is run in a greenlet thread.
@@ -63,9 +60,8 @@ class Benchmark(object):
       start = diff(0)
       #TODO result = solr.search(<SEARCH TERMS>)
       delta_time = diff(start)
-      self.q.put(delta_time, block=False)
-
-
+      self.q.put('%f'%delta_time, block=False)
+      
 ###############Process Management################
 if __name__ == '__main__':
    parser = optparse.OptionParser()
@@ -75,13 +71,16 @@ if __name__ == '__main__':
                      dest='processes', default=4)
    parser.add_option('-n', '--nodes', help='nodes list file', 
                      dest='nodes', default='nodes.txt')
+   parser.add_option('-o', '--output', help='output filename',
+                     dest='output', default=None)
    (opts, args) = parser.parse_args()
 
    #Process management stuff
    processes = []
    queue = Queue(int(opts.requests) * int(opts.processes))
    for i in xrange(int(opts.processes)):
-      benchmark = Benchmark(i, queue, num_req=int(opts.requests), nodes=opts.nodes)
+      benchmark = Benchmark(i, queue, num_req=int(opts.requests), 
+               nodes=opts.nodes)
       processes.append(Process(target=benchmark.start))
       processes[-1].start()
   
@@ -91,9 +90,18 @@ if __name__ == '__main__':
          proc.terminate()
    signal.signal(signal.SIGTERM, shutdown)
 
+   #Post Processing
+   if not opts.output:
+      output_file = ''.join(random.sample(string.letters+string.digits, 10))+'.bench'
+   else:
+      output_file = opts.output
    try:
       for proc in processes:
          proc.join()
+      print 'writing output to file' 
+      with open(output_file, "w") as f:
+         while not queue.empty():
+            f.write(queue.get(block=True, timeout=10))
    except KeyboardInterrupt as ki:
       for proc in processes:
          proc.terminate()
