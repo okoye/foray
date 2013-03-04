@@ -57,8 +57,10 @@ class Benchmark(object):
       url = random.sample(self.solr_urls, 1)[0]
       solr = pysolr.Solr(url)
       diff = lambda past: time.time() - past
+      term = random.sample(['california', 'facebook', 'microsoft', 'wikipedia',
+      'obama'], 1)[0]
       start = diff(0)
-      result = solr.search('california') #TODO
+      result = solr.search(term) 
       delta_time = diff(start)
       self.q.put(delta_time, block=False)
       
