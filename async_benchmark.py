@@ -75,6 +75,8 @@ if __name__ == '__main__':
                      dest='nodes', default='nodes.txt')
    parser.add_option('-o', '--output', help='output filename',
                      dest='output', default=None)
+   parser.add_option('-c', '--cluster', help='cluster size',
+                     dest='cluster', default=None)
    (opts, args) = parser.parse_args()
 
    #Process management stuff
@@ -95,6 +97,8 @@ if __name__ == '__main__':
    #Post Processing
    if not opts.output:
       output_file = ''.join(random.sample(string.letters+string.digits, 10))+'.bench'
+      if opts.cluster:
+         output_file = opts.cluster+'_'+output_file
    else:
       output_file = opts.output
    try:
