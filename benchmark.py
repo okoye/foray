@@ -27,7 +27,7 @@ class Benchmark(object):
       print 'Benchmark started'
       self._benchmark()
 
-   def _solr_url(self, node, port=8983, args=''):
+   def _solr_url(self, node, port=8983, args='solr/wiki.solr/'):
       '''construct solr url object'''
       return 'http://%s:%s/%s'%(node, port, args)
    
