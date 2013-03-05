@@ -5,3 +5,4 @@ paramiko
 gevent
 pysolr
 simplejson
+lxml
