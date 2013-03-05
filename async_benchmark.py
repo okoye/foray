@@ -6,11 +6,12 @@ author: Chuka <okoye9@gmail.com>
 '''
 import optparse
 import signal
-import pysolr
 import random
 import time
 import logging
 import string
+import urllib2
+import urllib
 from multiprocessing import Process, Queue
 
 ###############Benchmark Proper#################
@@ -32,7 +33,7 @@ class Benchmark(object):
 
    def _solr_url(self, node, port=8983, args='solr/wiki.solr'):
       '''construct solr url object'''
-      return 'http://%s:%s/%s'%(node, port, args)
+      return 'http://%s:%s/%s/select/?'%(node, port, args)
    
    def _benchmark(self):
       '''
@@ -55,14 +56,15 @@ class Benchmark(object):
       actual request maker. records start time, end time and appends
       '''
       url = random.sample(self.solr_urls, 1)[0]
-      solr = pysolr.Solr(url)
       diff = lambda past: time.time() - past
       term = random.sample(['california', 'facebook', 'microsoft', 'wikipedia',
       'obama'], 1)[0]
+      encoded_args = urllib.urlencode({'q':term, 'wt':'json'})
       start = diff(0)
-      result = solr.search(term) 
+      result = urllib2.urlopen(url+encoded_args) 
       delta_time = diff(start)
-      self.q.put(delta_time, block=False)
+      value = "%s\t%s"%(result.getcode(), delta_time)
+      self.q.put(value, block=False)
       
 ###############Process Management################
 if __name__ == '__main__':
