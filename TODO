@@ -1,4 +1,4 @@
 Setup EC2 DSE cluster [increments of 5]
 Fabric should support installing wikipedia data on a node (only 1 required)
 Fabric should support parsing of ec2 ip output
-Manually setup driver node for cluster
+Statistics module should be able to describe spread and skew for a run

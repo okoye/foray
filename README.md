@@ -40,6 +40,15 @@ Also, the script requires a file called nodes.txt that contains a list of nodes
 to operate on and expects a bz2 file in /tmp containing wikipedia dataset
 
 ==========
-EC2 Notes:
+Statistics Notes:
 ==========
-Installation of ec2 command line tools is recommended to list all ips for your DSE cluster.
+The statistics module computes the important values of a particular run
+including the 
+- mean
+- std
+- 90th percentile value
+- skew
+
+Eventually, it emits a regression model describing performance of a fixed
+cluster as query volume increases and performance of a cluster as cluster size
+increases
