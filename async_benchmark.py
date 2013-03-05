@@ -10,18 +10,23 @@ import random
 import time
 import logging
 import string
-import urllib2
-import urllib
 from multiprocessing import Process, Queue
 
 ###############Benchmark Proper#################
 class Benchmark(object):
    
-   def __init__(self, i, queue, num_req=1000, nodes='nodes.txt'):
+   def __init__(self, i, queue, 
+                  num_req=1000, 
+                  nodes='nodes.txt',
+                  concurrent=10,
+                  timeout=4):
       self.process_id = i
       self.requests = int(num_req)
       self.solr_urls = []
       self.q = queue
+      self.c_requests = concurrent
+      self.tout = timeout
+
       for node in open(nodes):
          self.solr_urls.append(self._solr_url(node.strip()))
       print 'solr node list: ', self.solr_urls 
@@ -39,9 +44,18 @@ class Benchmark(object):
       '''
       spawn request_no of solr requests
       '''
+      #since we are using multiprocessing, spawn only when in your process
       import gevent
+      from gevent.pool import Pool
       from gevent import monkey; monkey.patch_socket()
-
+      import urllib
+      import urllib2
+      
+      pool = Pool(self.c_requests)
+      with gevent.Timeout(self.tout, False):
+         for i in xrange(self.c_requests, self.requests):
+            pool.spawn(self._request)
+         pool.join()
       greenlets = []
       for i in xrange(self.requests):
          greenlets.append(gevent.spawn(self._request))
