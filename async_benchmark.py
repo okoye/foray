@@ -50,8 +50,8 @@ class Benchmark(object):
       from gevent import monkey; monkey.patch_socket()
       
       pool = Pool(self.c_requests)
-      with gevent.Timeout(self.tout, False):
-         for i in xrange(self.c_requests, self.requests):
+      with gevent.Timeout(self.tout, None):
+         for i in xrange(self.requests):
             pool.spawn(self._request)
          print 'now waiting for pool completion...'
          pool.join()
