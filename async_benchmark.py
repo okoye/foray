@@ -48,8 +48,6 @@ class Benchmark(object):
       import gevent
       from gevent.pool import Pool
       from gevent import monkey; monkey.patch_socket()
-      import urllib
-      import urllib2
       
       pool = Pool(self.c_requests)
       with gevent.Timeout(self.tout, False):
@@ -64,6 +62,9 @@ class Benchmark(object):
       each of this is run in a greenlet thread.
       actual request maker. records start time, end time and appends
       '''
+      import urllib
+      import urllib2
+
       url = random.sample(self.solr_urls, 1)[0]
       diff = lambda past: time.time() - past
       term = random.sample(['california', 'facebook', 'microsoft', 'wikipedia',
@@ -78,11 +79,13 @@ class Benchmark(object):
 ###############Process Management################
 if __name__ == '__main__':
    parser = optparse.OptionParser()
-   parser.add_option('-r', '--requests', help='no of concurrent requests',
+   parser.add_option('-r', '--requests', help='no of total requests per process',
                      dest='requests', default=1000)
+   parser.add_option('-n', '--concrequest', help='no of concurrent requests',
+                     dest='crequests', default=10)
    parser.add_option('-p', '--processes', help='no of processes',
                      dest='processes', default=4)
-   parser.add_option('-n', '--nodes', help='nodes list file', 
+   parser.add_option('-f', '--nodes', help='nodes list file', 
                      dest='nodes', default='nodes.txt')
    parser.add_option('-o', '--output', help='output filename',
                      dest='output', default=None)
@@ -95,7 +98,7 @@ if __name__ == '__main__':
    queue = Queue(int(opts.requests) * int(opts.processes))
    for i in xrange(int(opts.processes)):
       benchmark = Benchmark(i, queue, num_req=int(opts.requests), 
-               nodes=opts.nodes)
+               nodes=opts.nodes, concurrent=int(opts.crequests))
       processes.append(Process(target=benchmark.start))
       processes[-1].start()
    
