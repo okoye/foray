@@ -51,4 +51,5 @@ including the
 
 Eventually, it emits a regression model describing performance of a fixed
 cluster as query volume increases and performance of a cluster as cluster size
-increases
+increases.
+
