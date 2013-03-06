@@ -19,7 +19,7 @@ class Benchmark(object):
                   num_req=1000, 
                   nodes='nodes.txt',
                   concurrent=10,
-                  timeout=4):
+                  timeout=6):
       self.process_id = i
       self.requests = int(num_req)
       self.solr_urls = []
