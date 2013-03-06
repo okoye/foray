@@ -55,14 +55,9 @@ class Benchmark(object):
       with gevent.Timeout(self.tout, False):
          for i in xrange(self.c_requests, self.requests):
             pool.spawn(self._request)
+         print 'now waiting for pool completion...'
          pool.join()
-      greenlets = []
-      for i in xrange(self.requests):
-         greenlets.append(gevent.spawn(self._request))
-
-      print 'now waiting for greenlet completion...'
-      gevent.joinall(greenlets)
-      print 'all greenlets completed'
+      print 'all pools completed successfully'
 
    def _request(self):
       '''
