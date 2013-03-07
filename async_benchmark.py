@@ -66,6 +66,7 @@ class Benchmark(object):
       import urllib2
 
       url = random.sample(self.solr_urls, 1)[0]
+      print "#### making request to %s ####"%url
       diff = lambda past: time.time() - past
       term = random.sample(['california', 'facebook', 'microsoft', 'wikipedia',
       'obama'], 1)[0]
