@@ -52,12 +52,12 @@ class Benchmark(object):
       pool = Pool(self.c_requests)
       with gevent.Timeout(self.tout, False):
          for i in xrange(self.requests):
-            pool.spawn(self._request)
+            pool.spawn(self._request, i)
          print 'now waiting for pool completion...'
          pool.join()
       print 'all pools completed successfully'
 
-   def _request(self):
+   def _request(self, i):
       '''
       each of this is run in a greenlet thread.
       actual request maker. records start time, end time and appends
@@ -74,7 +74,7 @@ class Benchmark(object):
       start = diff(0)
       result = urllib2.urlopen(url+encoded_args) 
       delta_time = diff(start)
-      value = "%s\t%s"%(result.getcode(), delta_time)
+      value = "%s:%s\t%s"%(self.process_id, i, delta_time)
       self.q.put(value, block=False)
       
 ###############Process Management################
