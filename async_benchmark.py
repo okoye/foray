@@ -26,7 +26,7 @@ class Benchmark(object):
       self.q = queue
       self.c_requests = concurrent
       self.tout = timeout
-
+      
       for node in open(nodes):
          self.solr_urls.append(self._solr_url(node.strip()))
       print 'solr node list: ', self.solr_urls 
