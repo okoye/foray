@@ -3,4 +3,7 @@ pycrypto
 paramiko
 gevent
 numpy>=1.6.1
+python-dateutil>=1.5
+scipy
+matplotlib
 
