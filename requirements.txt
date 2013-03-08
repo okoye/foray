@@ -2,3 +2,5 @@ greenlet
 pycrypto
 paramiko
 gevent
+numpy>=1.6.1
+
