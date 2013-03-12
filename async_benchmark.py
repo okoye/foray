@@ -19,7 +19,8 @@ class Benchmark(object):
                   num_req=1000, 
                   nodes='nodes.txt',
                   concurrent=10,
-                  timeout=6):
+                  timeout=6,
+                  terms=None):
       self.process_id = i
       self.requests = int(num_req)
       self.solr_urls = []
@@ -27,6 +28,9 @@ class Benchmark(object):
       self.c_requests = concurrent
       self.tout = timeout
       
+      if terms:
+         self.terms = self._terms_processing(terms)
+
       for node in open(nodes):
          self.solr_urls.append(self._solr_url(node.strip()))
       print 'solr node list: ', self.solr_urls 
@@ -35,6 +39,22 @@ class Benchmark(object):
    def start(self):
       print 'Benchmark started'
       self._benchmark()
+
+   def _terms_processing(self, term_file):
+      print 'Processing terms'
+      terms = list()
+      for line in term_file:
+         terms.append(line.strip())
+      return terms
+
+   def _random_term(self):
+      '''return a random term to be searched'''
+      term = random.sample(['california','facebook','microsoft',
+                           'wikipedia','obama'], 1)[0]
+      if hasattr(self, 'terms'):
+         index = random.randint(0, len(self.terms)-1)
+         return self.term[index]
+      return term
 
    def _solr_url(self, node, port=8983, args='solr/wiki.solr'):
       '''construct solr url object'''
@@ -68,8 +88,7 @@ class Benchmark(object):
       url = random.sample(self.solr_urls, 1)[0]
       print "#### making request to %s ####"%url
       diff = lambda past: time.time() - past
-      term = random.sample(['california', 'facebook', 'microsoft', 'wikipedia',
-      'obama'], 1)[0]
+      term = self._random_term()
       encoded_args = urllib.urlencode({'q':term, 'wt':'json'})
       start = diff(0)
       result = urllib2.urlopen(url+encoded_args) 
@@ -92,6 +111,8 @@ if __name__ == '__main__':
                      dest='output', default=None)
    parser.add_option('-c', '--cluster', help='cluster size',
                      dest='cluster', default=None)
+   parser.add_option('-t', '--terms', help='terms to query file',
+                     dest='terms', default=None)
    (opts, args) = parser.parse_args()
 
    #Process management stuff
