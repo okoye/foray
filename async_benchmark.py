@@ -86,10 +86,10 @@ class Benchmark(object):
       import urllib2
 
       url = random.sample(self.solr_urls, 1)[0]
-      print "#### making request to %s ####"%url
       diff = lambda past: time.time() - past
       term = self._random_term()
       encoded_args = urllib.urlencode({'q':term, 'wt':'json'})
+      print '####### making request to %s #######'%(url+encoded_args)
       start = diff(0)
       result = urllib2.urlopen(url+encoded_args) 
       delta_time = diff(start)
