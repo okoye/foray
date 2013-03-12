@@ -43,7 +43,7 @@ class Benchmark(object):
    def _terms_processing(self, term_file):
       print 'Processing terms'
       terms = list()
-      for line in term_file:
+      for line in open(term_file):
          terms.append(line.strip())
       return terms
 
@@ -53,7 +53,7 @@ class Benchmark(object):
                            'wikipedia','obama'], 1)[0]
       if hasattr(self, 'terms'):
          index = random.randint(0, len(self.terms)-1)
-         return self.term[index]
+         return self.terms[index]
       return term
 
    def _solr_url(self, node, port=8983, args='solr/wiki.solr'):
@@ -120,7 +120,8 @@ if __name__ == '__main__':
    queue = Queue(int(opts.requests) * int(opts.processes))
    for i in xrange(int(opts.processes)):
       benchmark = Benchmark(i, queue, num_req=int(opts.requests), 
-               nodes=opts.nodes, concurrent=int(opts.crequests))
+               nodes=opts.nodes, concurrent=int(opts.crequests),
+               terms=opts.terms)
       processes.append(Process(target=benchmark.start))
       processes[-1].start()
    
