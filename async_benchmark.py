@@ -91,8 +91,14 @@ class Benchmark(object):
       encoded_args = urllib.urlencode({'q':term, 'wt':'json'})
       print '####### making request to %s #######'%(url+encoded_args)
       start = diff(0)
-      result = urllib2.urlopen(url+encoded_args) 
-      delta_time = diff(start)
+      try:
+         result = urllib2.urlopen(url+encoded_args) 
+      except urllib2.HTTPError as http:
+         delta_time = http.code
+      except Exception as ex:
+         delta_time = -1
+      else:
+         delta_time = diff(start)
       value = "%s:%s\t%s"%(self.process_id, i, delta_time)
       self.q.put(value, block=False)
       
