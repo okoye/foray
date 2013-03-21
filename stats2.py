@@ -20,4 +20,4 @@ def main(input_file):
 
 
 if __name__ == '__main__':
-   main('../results/19NodeRun.log')
+   main('/Users/dokoye/Desktop/dump/benchmark_data/4_400.log')
