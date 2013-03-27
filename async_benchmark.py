@@ -14,7 +14,7 @@ from multiprocessing import Process, Queue
 
 ###############Benchmark Proper#################
 class Benchmark(object):
-   
+   #TODO: switch to logging rather than print
    def __init__(self, i, queue, 
                   num_req=1000, 
                   nodes='nodes.txt',

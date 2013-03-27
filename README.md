@@ -45,7 +45,7 @@ Statistics Notes:
 The statistics module computes the important values of a particular run
 including the 
 - mean
-- std
+- std 
 - 90th percentile value
 - skew
 
