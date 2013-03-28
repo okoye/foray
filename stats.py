@@ -3,11 +3,13 @@ compute some basic statistics and charts
 
 author: Chuka <okoye9@gmail.com>
 '''
-import numpy as np
-from scipy import stats
+from os import listdir
+from scipy import stats as sci
 from itertools import groupby
+from statlib import stats
 
 def sort(buffers):
+   '''helper function to sort process data'''
    splitter1 = lambda x: x.split('\t')[0].split(':')[0]
    splitter2 = lambda y: y.split('\t')[1].split(':')[1]
    
@@ -16,15 +18,18 @@ def sort(buffers):
          for value in group2:
             yield value.strip()
 
+
 class Statistician(object):
    
-   def __init__(self, input_file=None):
-      assert(input_file is not None)
-      setattr(self, 'input', input_file)
-
    def mean(self, values):
       '''
       compute mean of passed set of values
+      '''
+      return stats.mean(values)
+
+   def cleaned_mean(self, values):
+      '''
+      compute mean of all values that fall within 2 s.d
       '''
       pass
 
@@ -32,28 +37,34 @@ class Statistician(object):
       '''
       compute standard deviation of values
       '''
-      pass
+      return stats.stdev(values)
 
    def percentile(self, tile, values):
       '''
       compute the 'tile'-percentile value of values
       '''
-      return stats.scoreatpercentile(values, tile)
+      return sci.scoreatpercentile(values, tile)
 
-   def _parse(self, line, major_sep='\t', minor_sep=':'):
-      key, value = line.split(major_sep)
-      proc, req = key.split(minor_sep)
-      return (int(proc), int(req), float(value))
+   def compute(self, values):
+      '''
+      compute all available descriptive stats
+      '''
+      return ( self.mean(values),
+               self.std(values),
+               self.percentile(90, values))
 
-   def compute(self):
-      matrix = list()
-      for line in open(self.input):
-         process, request, value = self._parse(line)
-         matrix[request, process] = value
-         matrix.append((process, request, value))
-      
+def main(directory):
+   print 'processing files in', directory
+   stats = Statistician()
+   buff = list()
+   results = list()
+   for f in listdir(directory): 
+      #load file into memory
+      for l in open('/'.join([directory, f])):
+         buff.append(float(l.split('\t')[1]))
+      #compute stats for file
+      results.append(stats.compute(buff))
+   print 'finished computing results', len(results)
 
 if __name__ == '__main__':
-   Statistician(input_file='../results/7NodeRun.log',
-                  rows=250,
-                  cols=8).compute()
+   main('/Users/dokoye/Desktop/dump/records/raw')
