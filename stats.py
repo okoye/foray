@@ -3,6 +3,7 @@ compute some basic statistics and charts
 
 author: Chuka <okoye9@gmail.com>
 '''
+import optparse
 from os import listdir
 from scipy import stats as sci
 from itertools import groupby
@@ -67,4 +68,8 @@ def main(directory):
    print 'finished computing results', len(results)
 
 if __name__ == '__main__':
-   main('/Users/dokoye/Desktop/dump/records/raw')
+   parser = optparse.OptionParser()
+   parser.add_option('-d', '--directory', help='directory containing files',
+                     dest='direc', default='./')
+   (opts, args) = parser.parse_args()
+   main(opts.direc)
