@@ -5,37 +5,34 @@ author: Chuka <okoye9@gmail.com>
 '''
 import numpy as np
 from scipy import stats
+from itertools import groupby
 
-#TODO: support args to program
+def sort(buffers):
+   splitter1 = lambda x: x.split('\t')[0].split(':')[0]
+   splitter2 = lambda y: y.split('\t')[1].split(':')[1]
+   
+   for k1, group1 in groupby(sorted(buffers, key=splitter1), key=splitter1):
+      for k2, group2 in groupby(sorted(group1, key=splitter2), key=splitter2):
+         for value in group2:
+            yield value.strip()
 
 class Statistician(object):
    
-   def __init__(self, input_file=None, rows=0, cols=0):
+   def __init__(self, input_file=None):
       assert(input_file is not None)
-      assert(rows > 0 and cols > 0)
       setattr(self, 'input', input_file)
-      setattr(self, 'rows', rows)
-      setattr(self, 'cols', cols)
 
-   def graph(self, values):
+   def mean(self, values):
       '''
-      generates a line graph given a list of tuples (x, y)
+      compute mean of passed set of values
       '''
       pass
 
-   def describe(self, values, title=None):
+   def std(self, values):
       '''
-      generate some statistic for the passed set of values
+      compute standard deviation of values
       '''
-      mean = np.mean(values)
-      std = np.std(values)
-      var = np.var(values)
-
-      print '###############Statistics for %s #############'%title
-      print 'Mean: %s'%mean
-      print 'Standard Deviation: %s'%std
-      print 'Variance: %s'%var
-      
+      pass
 
    def percentile(self, tile, values):
       '''
