@@ -50,26 +50,33 @@ class Statistician(object):
       '''
       compute all available descriptive stats
       '''
-      return ( self.mean(values),
-               self.std(values),
-               self.percentile(90, values))
+      return '%f\t%f\t%f'%(self.mean(values),
+                           self.std(values),
+                           self.percentile(90, values))
 
-def main(directory):
+def main(directory, output):
    print 'processing files in', directory
    stats = Statistician()
    buff = list()
    results = list()
+   results.append('logid\tmean\tstdev\t90percentile')
+
    for f in listdir(directory): 
       #load file into memory
       for l in open('/'.join([directory, f])):
          buff.append(float(l.split('\t')[1]))
       #compute stats for file
-      results.append(stats.compute(buff))
+      results.append('%s\t%s'%(f, stats.compute(buff)))
    print 'finished computing results', len(results)
+   with open(output, 'w') as f:
+      for line in results:
+         f.write('%s\n'%line)
 
 if __name__ == '__main__':
    parser = optparse.OptionParser()
    parser.add_option('-d', '--directory', help='directory containing files',
                      dest='direc', default='./')
+   parser.add_option('-o', '--output', help='output dir',
+                     dest='output', default='output.txt')
    (opts, args) = parser.parse_args()
-   main(opts.direc)
+   main(opts.direc, opts.output)
