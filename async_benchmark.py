@@ -48,7 +48,8 @@ class Benchmark(object):
       return terms
 
    def _random_term(self):
-      '''return a random term to be searched'''
+      '''return a random term to be searched either from term list
+         a file of search terms passed in from command line'''
       term = random.sample(['california','facebook','microsoft',
                            'wikipedia','obama'], 1)[0]
       if hasattr(self, 'terms'):
