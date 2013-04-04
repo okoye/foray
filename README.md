@@ -49,7 +49,12 @@ including the
 - 90th percentile value
 - skew
 
-Eventually, it emits a regression model describing performance of a fixed
+======
+TODO
+======
+- Eventually, it should emit a regression model describing performance of a fixed
 cluster as query volume increases and performance of a cluster as cluster size
 increases.
-
+- It should also be able to answer the question, given some work load and
+  expected data growth, what would be an ideal size of a cluster given the
+  performance model and more importantly financial cost.
