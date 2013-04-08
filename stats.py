@@ -63,7 +63,7 @@ class Statistician(object):
                            self.std(values),
                            self.percentile(90, values))
 
-def main(directory, output):
+def main(directory, output, clean=False):
    print 'processing files in', directory
    stats = Statistician()
    buff = list()
@@ -75,7 +75,8 @@ def main(directory, output):
       for l in open('/'.join([directory, f])):
          buff.append(float(l.split('\t')[1]))
       #compute stats for file
-      results.append('%s\t%s'%(f, stats.compute(buff, skip_500s=True)))
+      results.append('%s\t%s'%(f, stats.compute(buff, 
+               skip_500s=True, clean_data=clean)))
    print 'finished computing results', len(results)
    with open(output, 'w') as f:
       for line in results:
@@ -87,5 +88,7 @@ if __name__ == '__main__':
                      dest='direc', default='./')
    parser.add_option('-o', '--output', help='output dir',
                      dest='output', default='output.txt')
+   parser.add_option('-c', '--clean', help='compute on cleaned data',
+                     dest='clean', default=False)
    (opts, args) = parser.parse_args()
-   main(opts.direc, opts.output)
+   main(opts.direc, opts.output, clean=opts.clean)
