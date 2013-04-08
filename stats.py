@@ -9,19 +9,11 @@ from scipy import stats as sci
 from itertools import groupby
 from statlib import stats
 
-def sort(buffers):
-   '''helper function to sort process data'''
-   splitter1 = lambda x: x.split('\t')[0].split(':')[0]
-   splitter2 = lambda y: y.split('\t')[1].split(':')[1]
-   
-   for k1, group1 in groupby(sorted(buffers, key=splitter1), key=splitter1):
-      for k2, group2 in groupby(sorted(group1, key=splitter2), key=splitter2):
-         for value in group2:
-            yield value.strip()
-
-
 class Statistician(object):
-   
+  
+   def __init__(self):
+      pass  
+
    def mean(self, values):
       '''
       compute mean of passed set of values
@@ -32,6 +24,12 @@ class Statistician(object):
       '''
       compute mean of all values that fall within 2 s.d
       '''
+      pass
+
+   def cleaned_percentile(values):
+      pass
+
+   def cleaned_std(values):
       pass
 
    def std(self, values):
@@ -46,10 +44,21 @@ class Statistician(object):
       '''
       return sci.scoreatpercentile(values, tile)
 
-   def compute(self, values):
+   def compute(self, values, skip_500s=False, 
+                  clean_data=False):
       '''
       compute all available descriptive stats
       '''
+      if skip_500s:
+         cleaned_values = [e for e in values if e != 500.0]
+         values = cleaned_values
+         print 'skipped 500 errors'
+      if clean_data:
+         std = self.std(values)
+         mean = self.mean(values)
+         inrange = lambda x: x < mean+(std*2) and x > mean-(std*2)
+         cleaned_values = [e for e in values if e inrange(e)]
+         values = cleaned_values
       return '%f\t%f\t%f'%(self.mean(values),
                            self.std(values),
                            self.percentile(90, values))
@@ -60,13 +69,13 @@ def main(directory, output):
    buff = list()
    results = list()
    results.append('logid\tmean\tstdev\t90percentile')
-
+   
    for f in listdir(directory): 
       #load file into memory
       for l in open('/'.join([directory, f])):
          buff.append(float(l.split('\t')[1]))
       #compute stats for file
-      results.append('%s\t%s'%(f, stats.compute(buff)))
+      results.append('%s\t%s'%(f, stats.compute(buff, skip_500s=True)))
    print 'finished computing results', len(results)
    with open(output, 'w') as f:
       for line in results:
