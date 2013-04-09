@@ -57,7 +57,7 @@ class Statistician(object):
          std = self.std(values)
          mean = self.mean(values)
          inrange = lambda x: x < mean+(std*2) and x > mean-(std*2)
-         cleaned_values = [e for e in values if e inrange(e)]
+         cleaned_values = [e for e in values if inrange(e)]
          values = cleaned_values
       return '%f\t%f\t%f'%(self.mean(values),
                            self.std(values),
