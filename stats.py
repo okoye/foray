@@ -59,6 +59,7 @@ class Statistician(object):
          inrange = lambda x: x < mean+(std*2) and x > mean-(std*2)
          cleaned_values = [e for e in values if inrange(e)]
          values = cleaned_values
+         print 'using cleaned data'
       return '%f\t%f\t%f'%(self.mean(values),
                            self.std(values),
                            self.percentile(90, values))
