@@ -10,6 +10,9 @@ import random
 import time
 import logging
 import string
+import pycassa
+from pycassa.pool import ConnectionPool
+from pycassa.system_manager import *
 from multiprocessing import Process, Queue
 
 ###############Benchmark Proper#################
@@ -27,18 +30,27 @@ class Benchmark(object):
       self.q = queue
       self.c_requests = concurrent
       self.tout = timeout
-      
+      self.nodes = []
+
       if terms:
          self.terms = self._terms_processing(terms)
 
       for node in open(nodes):
+         self.nodes.append(node)
          self.solr_urls.append(self._solr_url(node.strip()))
+
+      self.cass_man = SystemManager(self.nodes[-1])
       print 'solr node list: ', self.solr_urls 
       print 'Benchmark instantiated'
 
    def start(self):
       print 'Benchmark started'
+      self._setup_cassandra()
       self._benchmark()
+   
+   def _setup_cassandra(self):
+      '''create keyspace & column family if absent'''
+      self.cass_man.create_keyspace()
 
    def _terms_processing(self, term_file):
       print 'Processing terms'
